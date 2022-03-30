@@ -19,6 +19,17 @@ class Webpacker::Compiler
   end
 
   def compile
+    files = Dir[*default_watched_paths, *watched_paths].reject { |f| File.directory?(f) }
+    file_ids = files.sort.map { |f| "#{File.basename(f)}/#{Digest::SHA1.file(f).hexdigest}" }
+    logger.info "files used in digest (along with each's digest) are..."
+    file_ids.each do |id|
+      logger.info id
+    end
+
+    logger.info "compilation_digest_path is #{compilation_digest_path}"
+    logger.info "last_compilation_digest is #{last_compilation_digest}"
+    logger.info "watched_files_digest is #{watched_files_digest}"
+
     if stale?
       run_webpack.tap do |success|
         # We used to only record the digest on success
