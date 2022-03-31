@@ -33,7 +33,7 @@ class Webpacker::Compiler
     logger.info "watched_files_digest is #{watched_files_digest}"
     logger.info "cache_path is #{config.cache_path}"
 
-    cache_files = Dir[*config.cache_path].reject { |f| File.directory?(f) }
+    cache_files = Dir[*config.cache_path.join("**/*")].reject { |f| File.directory?(f) }
     logger.info "files in cache_path are..."
     cache_files.each do |f|
       logger.info f
