@@ -30,6 +30,12 @@ class Webpacker::Compiler
     logger.info "last_compilation_digest is #{last_compilation_digest}"
     logger.info "watched_files_digest is #{watched_files_digest}"
 
+    cache_files = Dir[*config.cache_path].reject { |f| File.directory?(f) }
+    logger.info "files already in cache_path are..."
+    cache_files.each do |f|
+      logger.info f
+    end
+
     if stale?
       run_webpack.tap do |success|
         # We used to only record the digest on success
@@ -71,6 +77,7 @@ class Webpacker::Compiler
     end
 
     def record_compilation_digest
+      logger.info "writing watched_files_digest #{watched_files_digest} to #{compilation_digest_path}"
       config.cache_path.mkpath
       compilation_digest_path.write(watched_files_digest)
     end
