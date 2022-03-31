@@ -21,6 +21,8 @@ class Webpacker::Compiler
   def compile
     files = Dir[*default_watched_paths, *watched_paths].reject { |f| File.directory?(f) }
     file_ids = files.sort.map { |f| "#{File.basename(f)}/#{Digest::SHA1.file(f).hexdigest}" }
+
+    logger.info "~~ PRE COMPILE ~~"
     logger.info "files used in digest (along with each's digest) are..."
     file_ids.each do |id|
       logger.info id
@@ -29,9 +31,10 @@ class Webpacker::Compiler
     logger.info "compilation_digest_path is #{compilation_digest_path}"
     logger.info "last_compilation_digest is #{last_compilation_digest}"
     logger.info "watched_files_digest is #{watched_files_digest}"
+    logger.info "cache_path is #{config.cache_path}"
 
     cache_files = Dir[*config.cache_path].reject { |f| File.directory?(f) }
-    logger.info "files already in cache_path are..."
+    logger.info "files in cache_path are..."
     cache_files.each do |f|
       logger.info f
     end
@@ -47,6 +50,13 @@ class Webpacker::Compiler
     else
       logger.info "Everything's up-to-date. Nothing to do"
       true
+    end
+
+    cache_files = Dir[*config.cache_path].reject { |f| File.directory?(f) }
+    logger.info "~~ POST COMPILE ~~"
+    logger.info "files in cache_path are..."
+    cache_files.each do |f|
+      logger.info f
     end
   end
 
