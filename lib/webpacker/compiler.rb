@@ -33,11 +33,7 @@ class Webpacker::Compiler
     logger.info "watched_files_digest is #{watched_files_digest}"
     logger.info "cache_path is #{config.cache_path}"
 
-    cache_files = Dir[*config.cache_path.join("**/*")].reject { |f| File.directory?(f) }
-    logger.info "files in cache_path are..."
-    cache_files.each do |f|
-      logger.info f
-    end
+    log_cache_files
 
     if stale?
       run_webpack.tap do |success|
@@ -52,12 +48,8 @@ class Webpacker::Compiler
       true
     end
 
-    cache_files = Dir[*config.cache_path].reject { |f| File.directory?(f) }
     logger.info "~~ POST COMPILE ~~"
-    logger.info "files in cache_path are..."
-    cache_files.each do |f|
-      logger.info f
-    end
+    log_cache_files
   end
 
   # Returns true if all the compiled packs are up to date with the underlying asset files.
@@ -135,5 +127,13 @@ class Webpacker::Compiler
       env.merge("WEBPACKER_ASSET_HOST"        => ENV.fetch("WEBPACKER_ASSET_HOST", ActionController::Base.helpers.compute_asset_host),
                 "WEBPACKER_RELATIVE_URL_ROOT" => ENV.fetch("WEBPACKER_RELATIVE_URL_ROOT", ActionController::Base.relative_url_root),
                 "WEBPACKER_CONFIG" => webpacker.config_path.to_s)
+    end
+
+    def log_cache_files
+      cache_files = Dir[*config.cache_path.join("**/*")].reject { |f| File.directory?(f) }
+      logger.info "files in cache_path are..."
+      cache_files.each do |f|
+        logger.info f
+      end
     end
 end
